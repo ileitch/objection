@@ -84,6 +84,15 @@ static id<JSObjectionPropertyReflector> gPropertyReflector;
     pthread_mutex_unlock(&gObjectionMutex);
 }
 
+
++ (void)registerSingletonClass:(Class)theClass constructorBlock:(JSObjectionInjectorEntryConstructorBlock)constructorBlock {
+    pthread_mutex_lock(&gObjectionMutex);
+    if (theClass && [gObjectionContext objectForKey:NSStringFromClass(theClass)] == nil) {
+        [gObjectionContext setObject:[JSObjectionInjectorEntry entryWithClass:theClass scope:JSObjectionScopeSingleton constructorBlock:constructorBlock] forKey:NSStringFromClass(theClass)];
+    }
+    pthread_mutex_unlock(&gObjectionMutex);
+}
+
 + (void)reset {
     pthread_mutex_lock(&gObjectionMutex);
     [gObjectionContext removeAllObjects];

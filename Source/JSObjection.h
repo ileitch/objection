@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import "JSObjectionInjector.h"
+#import "JSObjectionInjectorEntry.h"
 #import "JSObjectionEntry.h"
 #import "JSObjectionUtils.h"
 
@@ -10,6 +11,7 @@
 + (JSObjectionInjector *)createInjector:(JSObjectionModule *)module;
 + (JSObjectionInjector *)createInjector;
 + (void)registerClass:(Class)theClass scope:(JSObjectionScope)scope;
++ (void)registerSingletonClass:(Class)theClass constructorBlock:(JSObjectionInjectorEntryConstructorBlock)constructorBlock;
 + (void)setDefaultInjector:(JSObjectionInjector *)anInjector;
 + (JSObjectionInjector *)defaultInjector;
 + (void)reset;

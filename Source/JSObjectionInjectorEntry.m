@@ -6,6 +6,7 @@
 @interface JSObjectionInjectorEntry() {
   JSObjectionScope _lifeCycle;
   id _storageCache;
+  JSObjectionInjectorEntryConstructorBlock _constructorBlock;
 }
 
 - (id)buildObject:(NSArray *)arguments initializer:(SEL)initializer;
@@ -19,7 +20,7 @@
 
 @synthesize lifeCycle = _lifeCycle;
 @synthesize classEntry = _classEntry;
-
+@synthesize constructorBlock = _constructorBlock;
 
 #pragma mark - Instance Methods
 
@@ -33,9 +34,17 @@
   return self;
 }
 
+- (instancetype)initWithClass:(Class)theClass lifeCycle:(JSObjectionScope)theLifeCycle constructorBlock:(JSObjectionInjectorEntryConstructorBlock)constructorBlock {
+    self = [self initWithClass:theClass lifeCycle:theLifeCycle];
+    if (self) {
+        _constructorBlock = constructorBlock;
+    }
+    return self;
+}
+
 - (instancetype) extractObject:(NSArray *)arguments initializer:(SEL)initializer {
     if (self.lifeCycle == JSObjectionScopeNormal || !_storageCache) {
-        return [self buildObject:arguments initializer: initializer];
+        return [self buildObject:arguments initializer:initializer];
     }
     return _storageCache;
 }
@@ -59,6 +68,8 @@
         objectUnderConstruction = JSObjectionUtils.buildObjectWithInitializer(self.classEntry, initializer, arguments);
     } else if ([self.classEntry respondsToSelector:@selector(objectionInitializer)]) {
         objectUnderConstruction = JSObjectionUtils.buildObjectWithInitializer(self.classEntry, [self initializerForObject], [self argumentsForObject:arguments]);
+    } else if (_constructorBlock) {
+        objectUnderConstruction = _constructorBlock();
     } else {
         objectUnderConstruction = [[self.classEntry alloc] init];
     }
@@ -88,6 +99,11 @@
 }
 
 + (id)entryWithEntry:(JSObjectionInjectorEntry *)entry {
-    return [[JSObjectionInjectorEntry alloc] initWithClass:entry.classEntry lifeCycle:entry.lifeCycle];  
+    return [[JSObjectionInjectorEntry alloc] initWithClass:entry.classEntry lifeCycle:entry.lifeCycle constructorBlock:entry.constructorBlock];
 }
+
++ (id)entryWithClass:(Class)theClass scope:(JSObjectionScope)theLifeCycle constructorBlock:(JSObjectionInjectorEntryConstructorBlock)constructorBlock {
+    return [[JSObjectionInjectorEntry alloc] initWithClass:theClass lifeCycle:theLifeCycle constructorBlock:constructorBlock];
+}
+
 @end
