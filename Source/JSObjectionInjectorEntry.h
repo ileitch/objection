@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import "JSObjectionEntry.h"
 
-typedef id (^JSObjectionInjectorEntryConstructorBlock)();
+typedef id (^JSObjectionInjectorEntryConstructorBlock)(void);
 
 @protocol JSObjectionInjectorEntrySelectors
 
